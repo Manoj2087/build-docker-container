@@ -9,16 +9,19 @@ import RobotButton from '../components/RobotButton'
 
 
 export default function Home() {
+
     return (
         <div className="siteBG">
             <Jumbotron className="myJumbotron" fluid>
-                <h3>Welcome Scientists !! We sell a wide range of robots, for both you good and evil needs.</h3>
+                <h3>Welcome Scientists !! </h3>
+                <p>
+                    We sell a wide range of robots, for both you good and evil needs.
+                </p>
             </Jumbotron>
             <Container>
                 <Row className="row">
                     <Col className="colHome" lg={4}>
                     <Image src='/images/home350x350.png' />
-                    {/* <h2>Welcome Scientists<br />We sell a wide range of<br />robots for you.</h2> */}
                     </Col>
                     <Col className="colButton" lg={4}>
                     <RobotButton 

@@ -7,6 +7,20 @@
     border-color: rgb(0, 207, 200);
 }
 
+.goodRobot:focus{
+    color: #fff;
+    background-color: #fbfbfb; 
+    border-color: rgb(0, 207, 200);
+    box-shadow: 0 0 0 0.2rem rgba(0, 207, 200, 0.384);
+}
+
+.goodRobot:hover{
+    color: #fff;
+    background-color: #fbfbfb; 
+    border-color: rgb(0, 207, 200);
+    box-shadow: 0 0 0 0.2rem rgba(0, 207, 200, 0.384);
+}
+
 .badRobot{
     background-image: url("/images/bad-robot350x350.png");
     font-size: 0px;
@@ -14,4 +28,18 @@
     color: #fff;
     background-color: #fbfbfb;  
     border-color:rgb(212, 0, 12);
+}
+
+.badRobot:focus{
+    color: #fff;
+    background-color: #fbfbfb; 
+    border-color: rgb(212, 0, 12);
+    box-shadow: 0 0 0 0.2rem rgba(212, 0, 11, 0.384);
+}
+
+.badRobot:hover{
+    color: #fff;
+    background-color: #fbfbfb; 
+    border-color: rgb(212, 0, 12);
+    box-shadow: 0 0 0 0.2rem rgba(212, 0, 11, 0.384);
 }

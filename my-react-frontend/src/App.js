@@ -1,34 +1,45 @@
 import React from 'react'
 import {Navbar, Nav, NavDropdown} from 'react-bootstrap'
 import Container from 'react-bootstrap/Container'
-import { BsGrid3X3Gap } from "react-icons/bs";
+import { BsGrid3X3Gap } from "react-icons/bs"
+import { Link } from 'react-router-dom'
 import './App.css'
-import Home from './containers/Home'
+import AppRoutes from './AppRoutes'
 
 export default function App() {
   return (
     <div className="app">
       <Container className="myNavBar">
         <Navbar fluid>
-          <Navbar.Brand href="#home">ROBO-Factory</Navbar.Brand>
-          <Nav>
+          <Navbar.Brand>
+            <Link to="/">
+              ROBO-Factory
+            </Link>
+          </Navbar.Brand>
+          <Nav className="container-fluid">
           <NavDropdown 
             title= {
               <BsGrid3X3Gap />
             }
-            id="basic-nav-dropdown"            
+            id="basic-nav-dropdown"
+            className="ml-auto"
           >          
-            <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-            <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
-            <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-            <NavDropdown.Divider />
-            <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
+            <NavDropdown.Item>
+              <Link to="/">
+                Home
+              </Link>
+            </NavDropdown.Item>
+            <NavDropdown.Item>
+              <Link to="/about">
+                About
+              </Link>
+            </NavDropdown.Item>
           </NavDropdown>
           </Nav>
         </Navbar>
       </Container>
       <Container>
-        <Home />
+        <AppRoutes />
       </Container>
     </div>
   )
