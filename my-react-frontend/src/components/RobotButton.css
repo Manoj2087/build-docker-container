@@ -1,0 +1,17 @@
+.goodRobot{
+    background-image: url("/images/good-robot350x350.png");
+    font-size: 0px;
+    padding: 175px 175px 175px 175px;
+    color: #fff;
+    background-color: #fbfbfb;
+    border-color: rgb(0, 207, 200);
+}
+
+.badRobot{
+    background-image: url("/images/bad-robot350x350.png");
+    font-size: 0px;
+    padding: 175px 175px 175px 175px;
+    color: #fff;
+    background-color: #fbfbfb;  
+    border-color:rgb(212, 0, 12);
+}
