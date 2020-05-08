@@ -1,7 +1,7 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import './RobotList.css'
-import APIFetch from '../components/APIFetch'
+import APIFetch from '../components/GetRobots'
 
 export default function RobotList() {
     const { robotType } = useParams()
