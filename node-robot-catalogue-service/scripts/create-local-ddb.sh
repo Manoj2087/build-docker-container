@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tableName="robot-calalogue"
+tableName="robot-catalogue"
 hostPort="8000"
 hostName="localhost"
 awsRegion="ap-southeast-2"

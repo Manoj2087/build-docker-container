@@ -25,7 +25,7 @@ paths:
       - "application/json"
       parameters:
       - in: body
-        name: robots
+        name: createRobot
         description: The robot to create.
         required: true
         schema:
@@ -38,7 +38,7 @@ paths:
         "400":
           description: "Bad Request"
           schema:
-            $ref: "#/definitions/Error400"
+            $ref: "#/definitions/Error4xx"
     get:
       tags:
       - "robots"    
@@ -50,19 +50,30 @@ paths:
     get:
       tags:
       - "robots"    
-      description: "Retreive a robot"
-      responses:
+      description: "Retreive a specific robot"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: robotName
+        description: name of robot to retreive.
+        required: true
+        type: integer
+      responses:  
         '200':
-          description: OK
+          description: "Created"
           schema:
-            type: object
-            properties:
-              id:
-                type: integer
-                description: The user ID.
-              username:
-                type: string
-                description: The user name.
+            $ref: "#/definitions/Robots"
+        "400":
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/Error4xx"
+        "404":
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error4xx"          
     put:
       tags:
       - "robots"
@@ -80,6 +91,13 @@ paths:
 
 
 definitions:
+  RobotName:
+    type: "object"
+    required:
+      - "name"
+    properties:
+      name:
+        type: "string"    
   Robots:
     type: "object"
     required:
@@ -95,7 +113,7 @@ definitions:
         type: "integer"
       imageURL:
         type: "string"
-  Error400:
+  Error4xx:
     type: "object"
     properties:
       errorMessage:

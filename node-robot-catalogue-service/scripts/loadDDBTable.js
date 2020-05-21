@@ -1,10 +1,6 @@
 const AWS = require('aws-sdk');
 const fs = require('fs');
 
-// console.log(process.env.MYAPP_AWS_REGION);
-// console.log(process.env.MYAPP_AWS_ENDPOINT);
-// console.log(process.env.MYAPP_TABLE_NAME);
-
 AWS.config.update({
     region: process.env.MYAPP_AWS_REGION ,
     endpoint: process.env.MYAPP_AWS_ENDPOINT

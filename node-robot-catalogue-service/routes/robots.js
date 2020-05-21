@@ -4,10 +4,19 @@ const robotsDebug = require('debug')('robots')
 const Joi = require('@hapi/joi')
 const AWS = require('aws-sdk');
 
+const awsRegion = process.env.MYAPP_AWS_REGION;
+const awsEndpoint = process.env.MYAPP_AWS_ENDPOINT
+const ddbRobotTable = process.env.MYAPP_ROBOT_TABLE
+
 AWS.config.update({
-    region: process.env.MYAPP_AWS_REGION ,
-    endpoint: process.env.MYAPP_AWS_ENDPOINT
+    region: awsRegion ,
+    endpoint: awsEndpoint
 })
+
+// AWS.config.update({
+//     region: "ap-southeast-2" ,
+//     endpoint: "http://localhost:8000"
+// })
 
 const docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
 
@@ -38,7 +47,45 @@ router.get('/', (req, res) => {
 
 //GET robots/{name}
 router.get('/:name', (req, res) => {
-    res.json('GET ' + req.params.name);
+    const name = req.params.name;
+
+    // validate input
+    // return 400 if invalid
+    const { error, value } = schema.validate({ 
+        name: name
+     });
+
+    if (error !== undefined) {
+    robotsDebug('Get robot validate error: ' + error)
+    return res.status(400).json(error.details[0].message);
+    }
+
+    async function getRobot(value) {
+        var params = {
+            TableName: ddbRobotTable,
+            Key: {
+                "R_NAME" : value.name
+            }
+        };
+
+        try {
+            const data = await docClient.get(params).promise();
+            robotsDebug('get item from dynamodb: Success')
+            robotsDebug('get item from dynamodb: ' + data)
+            
+            if (Object.entries(data).length === 0) {
+                return res.status(404).json({error: 'Not Found'});
+            }
+            return res.status(200).json(data);
+        } catch (error) {
+            robotsDebug('get item from dynamodb: Failure:' + error.message)
+            return res.status(400).json({error: error.message});
+        }    
+    }
+    // getitem from dynamodb
+    // success return 200
+    // Fail return 404
+    getRobot(value)
 });
 
 //POST robots
@@ -63,17 +110,45 @@ router.post('/', (req, res) => {
                                  });
 
     if (error !== undefined) {
-        robotsDebug('Post validate error: ' + console.log(error))
+        robotsDebug('Post validate error: ' + error)
         return res.status(400).json(error.details[0].message);
     }
 
-    // add to dynamodb
-    
+    async function createRobot(value) {
+        var params = {
+            TableName: ddbRobotTable,
+            Item: {
+                "R_NAME" : value.name,
+                "R_TYPE" : value.type,
+                "R_DESC" : value.description,
+                "R_COST" : value.cost,
+                "R_DELV_TIME" : value.deliveryTime,
+                "R_IMG_URL": value.imageURL        
+            },
+            ConditionExpression: "#RN <> :rnameValue",
+            ExpressionAttributeNames: {
+                "#RN" : "R_NAME"
+            },
+            ExpressionAttributeValues: {
+                ":rnameValue" : value.name
+            }
+        };
 
-    // if error return 400
+        try {
+            const data = await docClient.put(params).promise();
+            robotsDebug('add to dynamodb: Success')
+            robotsDebug('add to dynamodb: ' + data)
+            return res.status(201).json(value);
+        } catch (error) {
+            robotsDebug('add to dynamodb: Failure:' + error.message)
+            return res.status(400).json({error: error.message});
+        }    
+    }
 
-    // Else return the added item
-    res.json("success");
+    // putItem to dynamodb
+    // success return 201
+    // Fail return 400
+    createRobot(value)
 });
 
 //PUT robots/{name}
