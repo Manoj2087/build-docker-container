@@ -1,0 +1,106 @@
+swagger: "2.0"
+info:
+  title: "ROBO-Factory"
+  description: "ROBO-Factory API Documentation"
+  version: "1.0.0"
+host: "api.robo-factory.io"
+basePath: /v1
+tags:
+- name: "robots"
+  description: "Everything about robots"
+  externalDocs:
+    description: "Find out more"
+    url: "http://robo-factory.io"
+schemes:
+- "http"
+paths:
+  /robots:
+    post:
+      tags:
+      - "robots"
+      description: "Create a robot" 
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: body
+        name: robots
+        description: The robot to create.
+        required: true
+        schema:
+          $ref: "#/definitions/Robots"
+      responses:  
+        '201':
+          description: "Created"
+          schema:
+            $ref: "#/definitions/Robots"
+        "400":
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/Error400"
+    get:
+      tags:
+      - "robots"    
+      description: "Retreive all robots"
+      responses:
+        '200':
+          description: OK
+  /robots/{robotName}:
+    get:
+      tags:
+      - "robots"    
+      description: "Retreive a robot"
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: The user ID.
+              username:
+                type: string
+                description: The user name.
+    put:
+      tags:
+      - "robots"
+      description: "Update a robot"
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+      - "robots"
+      description: "Delete a robot"
+      responses:
+        '200':
+          description: OK
+
+
+definitions:
+  Robots:
+    type: "object"
+    required:
+      - "name"
+    properties:
+      name:
+        type: "string"
+      type :
+        type: "string"
+      cost :
+        type: "integer"
+      deliveryTime :
+        type: "integer"
+      imageURL:
+        type: "string"
+  Error400:
+    type: "object"
+    properties:
+      errorMessage:
+        type: "string"
+
+
+
+

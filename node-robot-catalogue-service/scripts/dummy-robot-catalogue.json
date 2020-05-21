@@ -1,0 +1,26 @@
+[
+    { 
+      "R_NAME" : "wall-e",
+      "R_TYPE" : "good",
+      "R_DESC" : "Cleaning robot",
+      "R_COST" : 100,
+      "R_DELV_TIME" : 1,
+      "R_IMG_URL": "http://wall-e"
+    },
+    { 
+        "R_NAME" : "t1000",
+        "R_TYPE" : "bad",
+        "R_DESC" : "Assassin robot",
+        "R_COST" : 1000,
+        "R_DELV_TIME" : 5,
+        "R_IMG_URL": "http://t1000"
+      },
+      { 
+        "R_NAME" : "t800",
+        "R_TYPE" : "good",
+        "R_DESC" : "protection robot",
+        "R_COST" : 800,
+        "R_DELV_TIME" : 4,
+        "R_IMG_URL": "http://t800"
+      }
+  ]

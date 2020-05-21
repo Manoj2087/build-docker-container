@@ -1,0 +1,23 @@
+{
+  "name": "robot-catalogue-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "debug": "DEBUG=* nodemon index.js",
+    "create-local-ddb": "cd ./scripts && ./create-local-ddb.sh && cd ..",
+    "load-local-ddb": "cd ./scripts && ./load-local-ddb.sh && cd ..",
+    "unload-local-ddb": "",
+    "delete-local-ddb": "cd ./scripts && ./delete-local-ddb.sh && cd .."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "aws-sdk": "^2.673.0",
+    "config": "^3.3.1",
+    "debug": "^4.1.1",
+    "express": "^4.17.1"
+  }
+}
