@@ -7,6 +7,7 @@ const AWS = require('aws-sdk');
 const awsRegion = process.env.MYAPP_AWS_REGION;
 const awsEndpoint = process.env.MYAPP_AWS_ENDPOINT
 const ddbRobotTable = process.env.MYAPP_ROBOT_TABLE
+const ddbRobotTableTypeIndex = process.env.MYAPP_ROBOT_T_TYPE_INDEX
 
 AWS.config.update({
     region: awsRegion ,
@@ -34,6 +35,18 @@ const schema = Joi.object({
     imageURL: Joi.string()
         .uri()
 });
+
+function renameKeys(arrayObject, newKeys, index = false) {
+    let newArray = [];
+    arrayObject.forEach((obj,item)=>{
+        const keyValues = Object.keys(obj).map((key,i) => {
+            return {[newKeys[i] || key]:obj[key]}
+        });
+        let id = (index) ? {'ID':item} : {}; 
+        newArray.push(Object.assign(id, ...keyValues));
+    });
+    return newArray;
+}
 
 //POST robots
 //createRobot
@@ -102,6 +115,99 @@ router.post('/', (req, res) => {
     createRobot(value)
 });
 
+//GET robots
+//listRobot
+router.get('/', (req, res) => {
+    async function listRobot() {
+        var params = {
+            TableName: ddbRobotTable,
+            ProjectionExpression: 'R_NAME, R_IMG_URL'
+        };
+
+        try {
+            const data = await docClient.scan(params).promise();
+            robotsDebug('scan all items from dynamodb: Success');
+            robotsDebug('scan all items from dynamodb: ' + data);
+            // change the data.Items object keys from DDB col to regular col name
+            const obj = data.Items;
+            const newKeys = ['name','imageURL'];
+            const renamedObj = renameKeys(obj, newKeys);
+            robotsDebug('renamed object: ' + renamedObj);
+            return res.status(200).json(renamedObj);
+        } catch (error) {
+            robotsDebug('scan all items from dynamodb: Failure:' + error.message)
+            return res.status(400).json({error: error.message});
+        }    
+    }
+    // scan tem from dynamodb
+    // success return 200
+    // Fail return 400
+    listRobot();
+});
+
+//GET robots/filterbytype?type=<value>
+//listRobotByType
+router.get('/filterbytype', (req, res) => {
+    robotsDebug('request query: ' + JSON.stringify(req.query));
+    const type = req.query.type;
+
+    //Validate query type
+    if (!type) {
+        return res.status(400).json({error: 'query \"type\" not found'});
+    } 
+
+    // Validate type
+    const schema = Joi.object({
+        type: Joi.string()
+            .lowercase()
+            .valid('good','bad')
+            .required()
+    });
+    const { error, value } = schema.validate({ 
+        type: type
+        });
+
+    if (error !== undefined) {
+        robotsDebug('Get all robots by type validate error: ' + JSON.stringify(error));
+        return res.status(400).json({error: error.details[0].message});
+    }
+
+    async function listRobotByType(value) {
+        var params = {
+            TableName: ddbRobotTable,
+            IndexName: ddbRobotTableTypeIndex,
+            KeyConditionExpression: '#RT = :RT',
+            ExpressionAttributeNames: {
+                '#RT' : 'R_TYPE'
+            },            
+            ExpressionAttributeValues: {
+              ':RT': value.type
+            },
+            ProjectionExpression: 'R_NAME, R_IMG_URL'
+          };
+
+        try {
+            const data = await docClient.query(params).promise();
+            robotsDebug('query items by type from dynamodb: Success');
+            robotsDebug('query items by type from dynamodb: ' + JSON.stringify(data));
+            // change the data.Items object keys from DDB col to regular col name
+            const obj = data.Items;
+            const newKeys = ['name','imageURL'];
+            const renamedObj = renameKeys(obj, newKeys);
+            robotsDebug('renamed object: ' + renamedObj);
+            return res.status(200).json(renamedObj);
+        } catch (error) {
+            robotsDebug('query items by type from dynamodb: Failure:' + error.message)
+            return res.status(400).json({error: error.message});
+        }    
+    }
+    // query item from dynamodb
+    // success return 200
+    // Fail return 400
+    listRobotByType(value)
+});
+
+
 //GET robots/{name}
 //getRobot
 router.get('/:name', (req, res) => {
@@ -135,7 +241,12 @@ router.get('/:name', (req, res) => {
             if (Object.entries(data).length === 0) {
                 return res.status(404).json({error: 'Not Found'});
             }
-            return res.status(200).json(data);
+            // change the data.Items object keys from DDB col to regular col name
+            const obj = [data.Item];
+            const newKeys = ['type','deliveryTime','imageURL','name','cost','description'];
+            const renamedObj = renameKeys(obj, newKeys);
+            robotsDebug('renamed object: ' + renamedObj[0]);
+            return res.status(200).json(renamedObj[0]);
         } catch (error) {
             robotsDebug('get item from dynamodb: Failure:' + error.message)
             return res.status(400).json({error: error.message});
@@ -265,14 +376,7 @@ router.delete('/:name', (req, res) => {
     // getitem from dynamodb
     // success return 204
     // Fail return 404
-    deleteRobot(value)
+    deleteRobot(value);
 });
-
-//GET robots
-//listRobot
-router.get('/', (req, res) => {
-    res.json('GET All');
-});
-
 
 module.exports = router;

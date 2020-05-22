@@ -43,9 +43,64 @@ paths:
       tags:
       - "robots"    
       description: "Retreive all robots"
-      responses:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:  
         '200':
-          description: OK
+          description: "Ok"
+          schema:
+            type: "array"
+            items:
+              type: "object"
+              properties:
+                name :
+                  type: "string"
+                imageURL:
+                  type: "string"
+        "400":
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/Error4xx"
+
+  /robots/filterbytype:
+    get:
+      tags:
+      - "robots"    
+      description: "Retreive all robots filtered by type"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "type"
+        in: "query"
+        description: "Robot type values for filter"
+        type: "string"
+        required: true
+        items:
+          type: "string"
+          enum:
+          - "good"
+          - "bad"
+        collectionFormat: "multi"
+      responses:  
+        '200':
+          description: "Ok"
+          schema:
+            type: "array"
+            items:
+              type: "object"
+              properties:
+                name :
+                  type: "string"
+                imageURL:
+                  type: "string"
+        "400":
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/Error4xx"
   /robots/{robotName}:
     get:
       tags:
@@ -63,7 +118,7 @@ paths:
         type: integer
       responses:  
         '200':
-          description: "Created"
+          description: "Ok"
           schema:
             $ref: "#/definitions/Robots"
         "400":
@@ -73,40 +128,101 @@ paths:
         "404":
           description: "Not Found"
           schema:
-            $ref: "#/definitions/Error4xx"          
+            $ref: "#/definitions/Error4xx"
     put:
       tags:
       - "robots"
       description: "Update a robot"
-      responses:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: robotName
+        description: name of robot to update.
+        required: true
+        type: integer
+      - in: body
+        name: createRobot
+        description: The robot to create.
+        required: true
+        schema:
+          type: "object"
+          required:
+            - "type"
+            - "cost"
+            - "deliveryTime"
+            - "imageURL"
+          properties:
+            type :
+              type: "string"
+              enum: 
+              - "good"
+              - "bad"
+            cost :
+              type: "integer"
+            deliveryTime :
+              type: "integer"
+            imageURL:
+              type: "string"
+      responses:  
         '200':
-          description: OK
+          description: "Ok"
+          schema:
+            $ref: "#/definitions/Robots"
+        "400":
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/Error4xx"
+        "404":
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error4xx"
     delete:
       tags:
       - "robots"
       description: "Delete a robot"
-      responses:
-        '200':
-          description: OK
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: robotName
+        description: name of robot to retreive.
+        required: true
+        type: integer
+      responses:  
+        '204':
+          description: "Deleted"
+        "400":
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/Error4xx"
+        "404":
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error4xx"
 
 
 definitions:
-  RobotName:
-    type: "object"
-    required:
-      - "name"
-    properties:
-      name:
-        type: "string"    
   Robots:
     type: "object"
     required:
       - "name"
+      - "type"
+      - "cost"
+      - "deliveryTime"
+      - "imageURL"
     properties:
       name:
         type: "string"
       type :
         type: "string"
+        enum: 
+        - "good"
+        - "bad"        
       cost :
         type: "integer"
       deliveryTime :
@@ -116,7 +232,7 @@ definitions:
   Error4xx:
     type: "object"
     properties:
-      errorMessage:
+      error:
         type: "string"
 
 
