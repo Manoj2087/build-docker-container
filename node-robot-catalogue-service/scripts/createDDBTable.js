@@ -1,12 +1,13 @@
 const AWS = require('aws-sdk');
 
-// console.log(process.env.MYAPP_AWS_REGION);
-// console.log(process.env.MYAPP_AWS_ENDPOINT);
-// console.log(process.env.MYAPP_TABLE_NAME);
+const awsRegion = process.env.MYAPP_AWS_REGION;
+const awsEndpoint = process.env.MYAPP_AWS_ENDPOINT
+const ddbRobotTable = process.env.MYAPP_TABLE_NAME
+const ddbRobotTableTypeIndex = process.env.MYAPP_ROBOT_T_TYPE_INDEX
 
 AWS.config.update({
-    region: process.env.MYAPP_AWS_REGION ,
-    endpoint: process.env.MYAPP_AWS_ENDPOINT
+    region: awsRegion ,
+    endpoint: awsEndpoint
 })
 
 // Create the DynamoDB service object
@@ -14,19 +15,51 @@ const ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 var params = {
     AttributeDefinitions: [
-      { AttributeName: 'R_NAME', AttributeType: 'S' }
+      { 
+        AttributeName: 'R_NAME',
+        AttributeType: 'S' 
+      },
+      { 
+        AttributeName: 'R_TYPE',
+        AttributeType: 'S' 
+      }      
     ],
     KeySchema: [
-      { AttributeName: 'R_NAME', KeyType: 'HASH' }
+      { 
+        AttributeName: 'R_NAME',
+        KeyType: 'HASH' 
+      }
     ],
     ProvisionedThroughput: {
       ReadCapacityUnits: 1,
       WriteCapacityUnits: 1
     },
-    TableName: process.env.MYAPP_TABLE_NAME,
+    TableName: ddbRobotTable,
     StreamSpecification: {
       StreamEnabled: false
-    }
+    },
+    GlobalSecondaryIndexes: [
+      {
+        IndexName: ddbRobotTableTypeIndex,
+        KeySchema: [ 
+          {
+            AttributeName: 'R_TYPE',
+            KeyType: 'HASH'
+          }
+        ],
+        Projection: {
+          NonKeyAttributes: [
+            'R_NAME',
+            'R_IMG_URL'
+          ],
+          ProjectionType: 'INCLUDE'
+        },
+        ProvisionedThroughput: {
+          ReadCapacityUnits: '1',
+          WriteCapacityUnits: '1'
+        }
+      }
+    ],
   };
   
   // Call DynamoDB to create the table

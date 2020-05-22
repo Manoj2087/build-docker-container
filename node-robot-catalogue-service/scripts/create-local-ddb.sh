@@ -1,6 +1,7 @@
 #!/bin/bash
 
 tableName="robot-catalogue"
+robotTableTypeIndex="type-index"
 hostPort="8000"
 hostName="localhost"
 awsRegion="ap-southeast-2"
@@ -32,4 +33,5 @@ echo -e "---------------------------------------"
 MYAPP_AWS_REGION=${awsRegion} \
     MYAPP_AWS_ENDPOINT="http://${hostName}:${hostPort}" \
     MYAPP_TABLE_NAME=${tableName} \
+    MYAPP_ROBOT_T_TYPE_INDEX=${robotTableTypeIndex} \
     node createDDBTable.js
