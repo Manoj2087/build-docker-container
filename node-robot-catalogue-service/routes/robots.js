@@ -13,11 +13,6 @@ AWS.config.update({
     endpoint: awsEndpoint
 })
 
-// AWS.config.update({
-//     region: "ap-southeast-2" ,
-//     endpoint: "http://localhost:8000"
-// })
-
 const docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
 
 robotsDebug('DEBUG app:robot...') 
@@ -40,55 +35,8 @@ const schema = Joi.object({
         .uri()
 });
 
-//GET robots
-router.get('/', (req, res) => {
-    res.json('GET All');
-});
-
-//GET robots/{name}
-router.get('/:name', (req, res) => {
-    const name = req.params.name;
-
-    // validate input
-    // return 400 if invalid
-    const { error, value } = schema.validate({ 
-        name: name
-     });
-
-    if (error !== undefined) {
-    robotsDebug('Get robot validate error: ' + error)
-    return res.status(400).json(error.details[0].message);
-    }
-
-    async function getRobot(value) {
-        var params = {
-            TableName: ddbRobotTable,
-            Key: {
-                "R_NAME" : value.name
-            }
-        };
-
-        try {
-            const data = await docClient.get(params).promise();
-            robotsDebug('get item from dynamodb: Success')
-            robotsDebug('get item from dynamodb: ' + data)
-            
-            if (Object.entries(data).length === 0) {
-                return res.status(404).json({error: 'Not Found'});
-            }
-            return res.status(200).json(data);
-        } catch (error) {
-            robotsDebug('get item from dynamodb: Failure:' + error.message)
-            return res.status(400).json({error: error.message});
-        }    
-    }
-    // getitem from dynamodb
-    // success return 200
-    // Fail return 404
-    getRobot(value)
-});
-
 //POST robots
+//createRobot
 router.post('/', (req, res) => {
     const name = req.body.name;
     const type = req.body.type;
@@ -101,17 +49,17 @@ router.post('/', (req, res) => {
 
     // validate input
     const { error, value } = schema.validate({ 
-                                    name: name,
-                                    type: type,
-                                    description: description,
-                                    cost: cost,
-                                    deliveryTime: deliveryTime,
-                                    imageURL: imageURL
-                                 });
+        name: name,
+        type: type,
+        description: description,
+        cost: cost,
+        deliveryTime: deliveryTime,
+        imageURL: imageURL
+        });
 
     if (error !== undefined) {
         robotsDebug('Post validate error: ' + error)
-        return res.status(400).json(error.details[0].message);
+        return res.status(400).json({error: error.details[0].message});
     }
 
     async function createRobot(value) {
@@ -141,6 +89,9 @@ router.post('/', (req, res) => {
             return res.status(201).json(value);
         } catch (error) {
             robotsDebug('add to dynamodb: Failure:' + error.message)
+            if (error.message == "The conditional request failed") {
+                return res.status(400).json({error: "Already exist"});
+            }
             return res.status(400).json({error: error.message});
         }    
     }
@@ -151,22 +102,177 @@ router.post('/', (req, res) => {
     createRobot(value)
 });
 
-//PUT robots/{name}
-router.put('/:name', (req, res) => {
-    res.json('PUT ' + req.params.name);
+//GET robots/{name}
+//getRobot
+router.get('/:name', (req, res) => {
+    const name = req.params.name;
+
     // validate input
+    // return 400 if invalid
+    const { error, value } = schema.validate({ 
+        name: name
+     });
 
-    // Query Dynamodb
+    if (error !== undefined) {
+        console.log(error);
+        
+        robotsDebug('Get robot validate error: ' + error.details[0])
+        return res.status(400).json({error: error.details[0].message});
+    }
 
-    // if empty return 404
+    async function getRobot(value) {
+        var params = {
+            TableName: ddbRobotTable,
+            Key: {
+                "R_NAME" : value.name
+            }
+        };
 
-    // else return the Data
+        try {
+            const data = await docClient.get(params).promise();
+            robotsDebug('get item from dynamodb: Success')
+            robotsDebug('get item from dynamodb: ' + data)
+            if (Object.entries(data).length === 0) {
+                return res.status(404).json({error: 'Not Found'});
+            }
+            return res.status(200).json(data);
+        } catch (error) {
+            robotsDebug('get item from dynamodb: Failure:' + error.message)
+            return res.status(400).json({error: error.message});
+        }    
+    }
+    // getitem from dynamodb
+    // success return 200
+    // Fail return 404
+    getRobot(value)
+});
 
+//PUT robots/{name}
+//updateRobot
+router.put('/:name', (req, res) => {
+    const name = req.params.name;
+    const type = req.body.type;
+    const description = req.body.description;
+    const cost = req.body.cost;
+    const deliveryTime = req.body.deliveryTime;
+    const imageURL = req.body.imageURL;
+
+    // validate input
+    const { error, value } = schema.validate({ 
+        name: name,
+        type: type,
+        description: description,
+        cost: cost,
+        deliveryTime: deliveryTime,
+        imageURL: imageURL
+     });
+
+     if (error !== undefined) {
+        robotsDebug('Put validate error: ' + error)
+        return res.status(400).json({error: error.details[0].message});
+    }
+
+    async function updateRobot(value) {
+        var params = {
+            TableName: ddbRobotTable,
+            Key: {
+                "R_NAME" : value.name
+            },
+            UpdateExpression: "SET #a=:a, #b=:b, #c=:c, #d=:d, #e=:e",
+            ConditionExpression: "#rn = :rn",
+            ExpressionAttributeNames: {
+                "#rn" : "R_NAME",
+                "#a" : "R_TYPE",
+                "#b" : "R_DESC",
+                "#c" : "R_COST",
+                "#d" : "R_DELV_TIME",
+                "#e" : "R_IMG_URL"
+            },
+            ExpressionAttributeValues: {
+                ":rn" : value.name,
+                ":a" : value.type,
+                ":b" : value.description,
+                ":c" : value.cost,
+                ":d" : value.deliveryTime,
+                ":e" : value.imageURL
+            }
+        };
+
+        try {
+            const data = await docClient.update(params).promise();
+            robotsDebug('update to dynamodb: Success')
+            robotsDebug('update to dynamodb: ' + data)
+            return res.status(200).json(value);
+        } catch (error) {
+            robotsDebug('update to dynamodb: Failure:' + error.message)
+            if (error.message == "The conditional request failed") {
+                return res.status(404).json({error: "Not Found"});
+            }
+            return res.status(400).json({error: error.message});
+        }    
+    }
+
+    // updateItem to dynamodb
+    // success return 200
+    // Fail return 4xx
+    updateRobot(value)
 });
 
 //DELETE robots/{name}
+//deleteRobot
 router.delete('/:name', (req, res) => {
-    res.json('DELETE ' + req.params.name);
+    const name = req.params.name;
+
+    // validate input
+    // return 400 if invalid
+    const { error, value } = schema.validate({ 
+        name: name
+     });
+
+    if (error !== undefined) {
+        robotsDebug('Delete robot validate error: ' + error)
+        return res.status(400).json({error: error.details[0].message});
+    }
+
+    async function deleteRobot(value) {
+        var params = {
+            TableName: ddbRobotTable,
+            Key: {
+                "R_NAME" : value.name
+            },
+            ConditionExpression: "#rn = :rn",
+            ExpressionAttributeNames: {
+                "#rn" : "R_NAME"
+            },
+            ExpressionAttributeValues: {
+                ":rn" : value.name
+            }
+        };
+
+        try {
+            const data = await docClient.delete(params).promise();
+            robotsDebug('delete item from dynamodb: Success')
+            robotsDebug('delete item from dynamodb: ' + data)
+            return res.status(204).json(data);
+        } catch (error) {
+            robotsDebug('delete item from dynamodb: Failure:' + error.message)
+            if (error.message == "The conditional request failed") {
+                return res.status(404).json({error: "Not Found"});
+            }
+            return res.status(400).json({error: error.message});
+        }    
+    }
+    // getitem from dynamodb
+    // success return 204
+    // Fail return 404
+    deleteRobot(value)
 });
+
+//GET robots
+//listRobot
+router.get('/', (req, res) => {
+    res.json('GET All');
+});
+
 
 module.exports = router;
