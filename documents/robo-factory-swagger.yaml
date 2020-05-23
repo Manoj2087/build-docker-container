@@ -63,6 +63,18 @@ paths:
           description: "Bad Request"
           schema:
             $ref: "#/definitions/Error4xx"
+  /robots/healthcheck:
+    get:
+      tags:
+      - "robots"    
+      description: "Retreive the health of robot calalogue service"
+      produces:
+        - "application/json"
+      responses:  
+        '200':
+          description: "Ok"
+        "400":
+          description: "Bad Request"
 
   /robots/filterbytype:
     get:

@@ -4,19 +4,28 @@ const robotsDebug = require('debug')('robots')
 const Joi = require('@hapi/joi')
 const AWS = require('aws-sdk');
 
+robotsDebug('DEBUG app:robot...');
+robotsDebug('env AWS_ACCESS_KEY_ID:' +  process.env.AWS_ACCESS_KEY_ID);
+robotsDebug('env AWS_SECRET_ACCESS_KEY:' +  process.env.AWS_SECRET_ACCESS_KEY); 
+robotsDebug('env MYAPP_AWS_REGION:' +  process.env.MYAPP_AWS_REGION);
+robotsDebug('env MYAPP_AWS_ENDPOINT:' +  process.env.MYAPP_AWS_ENDPOINT);
+robotsDebug('env MYAPP_ROBOT_T_TYPE_INDEX:' +  process.env.MYAPP_ROBOT_T_TYPE_INDEX);  
+
+const awsAccessKey = process.env.AWS_ACCESS_KEY_ID;
+const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY;
 const awsRegion = process.env.MYAPP_AWS_REGION;
-const awsEndpoint = process.env.MYAPP_AWS_ENDPOINT
-const ddbRobotTable = process.env.MYAPP_ROBOT_TABLE
-const ddbRobotTableTypeIndex = process.env.MYAPP_ROBOT_T_TYPE_INDEX
+const awsEndpoint = process.env.MYAPP_AWS_ENDPOINT;
+const ddbRobotTable = process.env.MYAPP_ROBOT_TABLE;
+const ddbRobotTableTypeIndex = process.env.MYAPP_ROBOT_T_TYPE_INDEX;
 
 AWS.config.update({
     region: awsRegion ,
-    endpoint: awsEndpoint
+    endpoint: awsEndpoint,
+    accessKeyId: awsAccessKey,
+    secretAccessKey: awsSecretKey
 })
 
 const docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
-
-robotsDebug('DEBUG app:robot...') 
 
 // Joi Validation Schema
 const schema = Joi.object({
@@ -47,6 +56,12 @@ function renameKeys(arrayObject, newKeys, index = false) {
     });
     return newArray;
 }
+
+//GET health
+//healthcheckRobotCatalogueService
+router.get('/health', function (req, res) {
+    res.status(200).json({status: 'UP'});
+});
 
 //POST robots
 //createRobot
@@ -97,8 +112,7 @@ router.post('/', (req, res) => {
 
         try {
             const data = await docClient.put(params).promise();
-            robotsDebug('add to dynamodb: Success')
-            robotsDebug('add to dynamodb: ' + data)
+            robotsDebug('Success add to dynamodb: ' + JSON.stringify(data))
             return res.status(201).json(value);
         } catch (error) {
             robotsDebug('add to dynamodb: Failure:' + error.message)
@@ -126,13 +140,12 @@ router.get('/', (req, res) => {
 
         try {
             const data = await docClient.scan(params).promise();
-            robotsDebug('scan all items from dynamodb: Success');
-            robotsDebug('scan all items from dynamodb: ' + data);
+            robotsDebug('Success scan all items from dynamodb: ' + JSON.stringify(data));
             // change the data.Items object keys from DDB col to regular col name
             const obj = data.Items;
             const newKeys = ['name','imageURL'];
             const renamedObj = renameKeys(obj, newKeys);
-            robotsDebug('renamed object: ' + renamedObj);
+            robotsDebug('renamed object: ' + JSON.stringify(renamedObj));
             return res.status(200).json(renamedObj);
         } catch (error) {
             robotsDebug('scan all items from dynamodb: Failure:' + error.message)
@@ -188,13 +201,12 @@ router.get('/filterbytype', (req, res) => {
 
         try {
             const data = await docClient.query(params).promise();
-            robotsDebug('query items by type from dynamodb: Success');
-            robotsDebug('query items by type from dynamodb: ' + JSON.stringify(data));
+            robotsDebug('Success query items by type from dynamodb: ' + JSON.stringify(data));
             // change the data.Items object keys from DDB col to regular col name
             const obj = data.Items;
             const newKeys = ['name','imageURL'];
             const renamedObj = renameKeys(obj, newKeys);
-            robotsDebug('renamed object: ' + renamedObj);
+            robotsDebug('renamed object: ' + JSON.stringify(renamedObj));
             return res.status(200).json(renamedObj);
         } catch (error) {
             robotsDebug('query items by type from dynamodb: Failure:' + error.message)
@@ -236,8 +248,7 @@ router.get('/:name', (req, res) => {
 
         try {
             const data = await docClient.get(params).promise();
-            robotsDebug('get item from dynamodb: Success')
-            robotsDebug('get item from dynamodb: ' + data)
+            robotsDebug('Success get item from dynamodb: ' + JSON.stringify(data));
             if (Object.entries(data).length === 0) {
                 return res.status(404).json({error: 'Not Found'});
             }
@@ -245,7 +256,7 @@ router.get('/:name', (req, res) => {
             const obj = [data.Item];
             const newKeys = ['type','deliveryTime','imageURL','name','cost','description'];
             const renamedObj = renameKeys(obj, newKeys);
-            robotsDebug('renamed object: ' + renamedObj[0]);
+            robotsDebug('renamed object: ' + JSON.stringify(renamedObj));
             return res.status(200).json(renamedObj[0]);
         } catch (error) {
             robotsDebug('get item from dynamodb: Failure:' + error.message)
@@ -311,8 +322,7 @@ router.put('/:name', (req, res) => {
 
         try {
             const data = await docClient.update(params).promise();
-            robotsDebug('update to dynamodb: Success')
-            robotsDebug('update to dynamodb: ' + data)
+            robotsDebug('Success update to dynamodb: ' + JSON.stringify(data))
             return res.status(200).json(value);
         } catch (error) {
             robotsDebug('update to dynamodb: Failure:' + error.message)
@@ -362,8 +372,7 @@ router.delete('/:name', (req, res) => {
 
         try {
             const data = await docClient.delete(params).promise();
-            robotsDebug('delete item from dynamodb: Success')
-            robotsDebug('delete item from dynamodb: ' + data)
+            robotsDebug('Success delete item from dynamodb: ' + JSON.stringify(data))
             return res.status(204).json(data);
         } catch (error) {
             robotsDebug('delete item from dynamodb: Failure:' + error.message)

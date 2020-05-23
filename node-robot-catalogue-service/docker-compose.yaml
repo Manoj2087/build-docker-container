@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+  robot-catalogue-ddb:
+    image: amazon/dynamodb-local
+    restart: always
+    ports:
+      - "8000:8000"
+
+  node-robot-catalogue-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      MYAPP_AWS_REGION: ap-southeast-2
+      MYAPP_AWS_ENDPOINT: "http://robot-catalogue-ddb:8000"
+      MYAPP_ROBOT_TABLE: robot-catalogue
+      MYAPP_ROBOT_T_TYPE_INDEX: type-index
+      AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE    
+      AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      DEBUG: robots
+    ports:
+      - "3000:3000"
+    volumes:
+      - '.:/usr/src/app'
+      - /usr/src/app/node_modules/
+    command: ["run","dev"]

@@ -1,23 +1,24 @@
 {
   "name": "robot-catalogue-service",
   "version": "1.0.0",
-  "description": "",
+  "description": "robot catalogue service",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
-    "debug": "DEBUG=* nodemon index.js",
-    "create-local-ddb": "cd ./scripts && ./create-local-ddb.sh && cd ..",
-    "load-local-ddb": "cd ./scripts && ./load-local-ddb.sh && cd ..",
-    "unload-local-ddb": "",
-    "delete-local-ddb": "cd ./scripts && ./delete-local-ddb.sh && cd .."
+    "start": "node index.js",
+    "dev": "cd ./scripts && node createDDBTable.js && node loadDDBTable.js && cd .. && nodemon index.js",
+    "debug": "DEBUG=* nodemon index.js"
   },
-  "author": "",
+  "author": "Manoj Alaghappan",
   "license": "ISC",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "aws-sdk": "^2.673.0",
     "config": "^3.3.1",
     "debug": "^4.1.1",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "lightship": "^6.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
   }
 }
