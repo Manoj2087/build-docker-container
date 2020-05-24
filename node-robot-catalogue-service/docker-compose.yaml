@@ -5,13 +5,14 @@ services:
     restart: always
     ports:
       - "8000:8000"
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb"]
 
   node-robot-catalogue-service:
     build:
       context: .
       dockerfile: Dockerfile.dev
     environment:
-      MYAPP_AWS_REGION: ap-southeast-2
+      MYAPP_AWS_REGION: localhost
       MYAPP_AWS_ENDPOINT: "http://robot-catalogue-ddb:8000"
       MYAPP_ROBOT_TABLE: robot-catalogue
       MYAPP_ROBOT_T_TYPE_INDEX: type-index
@@ -23,4 +24,4 @@ services:
     volumes:
       - '.:/usr/src/app'
       - /usr/src/app/node_modules/
-    command: ["run","dev"]
+    command: ["run",$ENV]

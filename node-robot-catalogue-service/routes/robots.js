@@ -27,24 +27,6 @@ AWS.config.update({
 
 const docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
 
-// Joi Validation Schema
-const schema = Joi.object({
-    name: Joi.string()
-        .lowercase()
-        .min(3)
-        .max(15)
-        .required(),
-    type: Joi.string()
-        .lowercase()
-        .valid('good','bad'),
-    description: Joi.string()
-        .max(50),
-    cost: Joi.number(),
-    deliveryTime: Joi.number(),
-    imageURL: Joi.string()
-        .uri()
-});
-
 function renameKeys(arrayObject, newKeys, index = false) {
     let newArray = [];
     arrayObject.forEach((obj,item)=>{
@@ -76,6 +58,27 @@ router.post('/', (req, res) => {
     robotsDebug('Post' + req.body)    
 
     // validate input
+    const schema = Joi.object({
+        name: Joi.string()
+            .lowercase()
+            .min(3)
+            .max(15)
+            .required(),
+        type: Joi.string()
+            .lowercase()
+            .valid('good','bad')
+            .required(),
+        description: Joi.string()
+            .max(50),
+        cost: Joi.number()
+            .required(),
+        deliveryTime: Joi.number()
+            .required(),
+        imageURL: Joi.string()
+            .uri()
+            .required(),
+    });
+
     const { error, value } = schema.validate({ 
         name: name,
         type: type,
@@ -83,7 +86,7 @@ router.post('/', (req, res) => {
         cost: cost,
         deliveryTime: deliveryTime,
         imageURL: imageURL
-        });
+    });
 
     if (error !== undefined) {
         robotsDebug('Post validate error: ' + error)
@@ -164,11 +167,6 @@ router.get('/filterbytype', (req, res) => {
     robotsDebug('request query: ' + JSON.stringify(req.query));
     const type = req.query.type;
 
-    //Validate query type
-    if (!type) {
-        return res.status(400).json({error: 'query \"type\" not found'});
-    } 
-
     // Validate type
     const schema = Joi.object({
         type: Joi.string()
@@ -178,7 +176,7 @@ router.get('/filterbytype', (req, res) => {
     });
     const { error, value } = schema.validate({ 
         type: type
-        });
+    });
 
     if (error !== undefined) {
         robotsDebug('Get all robots by type validate error: ' + JSON.stringify(error));
@@ -219,7 +217,6 @@ router.get('/filterbytype', (req, res) => {
     listRobotByType(value)
 });
 
-
 //GET robots/{name}
 //getRobot
 router.get('/:name', (req, res) => {
@@ -227,13 +224,18 @@ router.get('/:name', (req, res) => {
 
     // validate input
     // return 400 if invalid
+    const schema = Joi.object({
+        name: Joi.string()
+            .lowercase()
+            .min(3)
+            .max(15)
+            .required(),
+    });
     const { error, value } = schema.validate({ 
         name: name
-     });
+    });
 
     if (error !== undefined) {
-        console.log(error);
-        
         robotsDebug('Get robot validate error: ' + error.details[0])
         return res.status(400).json({error: error.details[0].message});
     }
@@ -280,6 +282,26 @@ router.put('/:name', (req, res) => {
     const imageURL = req.body.imageURL;
 
     // validate input
+    const schema = Joi.object({
+        name: Joi.string()
+            .lowercase()
+            .min(3)
+            .max(15)
+            .required(),
+        type: Joi.string()
+            .lowercase()
+            .valid('good','bad')
+            .required(),
+        description: Joi.string()
+            .max(50),
+        cost: Joi.number()
+            .required(),
+        deliveryTime: Joi.number()
+            .required(),
+        imageURL: Joi.string()
+            .uri()
+            .required(),
+    });
     const { error, value } = schema.validate({ 
         name: name,
         type: type,
@@ -346,6 +368,13 @@ router.delete('/:name', (req, res) => {
 
     // validate input
     // return 400 if invalid
+    const schema = Joi.object({
+        name: Joi.string()
+            .lowercase()
+            .min(3)
+            .max(15)
+            .required(),
+    });
     const { error, value } = schema.validate({ 
         name: name
      });

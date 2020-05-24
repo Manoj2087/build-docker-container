@@ -6,7 +6,14 @@
   "scripts": {
     "start": "node index.js",
     "dev": "cd ./scripts && node createDDBTable.js && node loadDDBTable.js && cd .. && nodemon index.js",
+    "test": "jest --watchAll --verbose --coverage",
     "debug": "DEBUG=* nodemon index.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   },
   "author": "Manoj Alaghappan",
   "license": "ISC",
@@ -19,6 +26,8 @@
     "lightship": "^6.1.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "jest": "^26.0.1",
+    "nodemon": "^2.0.4",
+    "supertest": "^4.0.2"
   }
 }
