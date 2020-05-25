@@ -4,9 +4,9 @@
   "description": "robot catalogue service",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "prod": "node index.js",
     "dev": "cd ./scripts && node createDDBTable.js && node loadDDBTable.js && cd .. && nodemon index.js",
-    "test": "jest --watchAll --verbose --coverage",
+    "test": "PORT=3005 jest --watchAll --verbose --coverage",
     "debug": "DEBUG=* nodemon index.js"
   },
   "jest": {
