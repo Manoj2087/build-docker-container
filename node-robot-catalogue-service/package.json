@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "prod": "node index.js",
-    "dev": "cd ./scripts && node createDDBTable.js && node loadDDBTable.js && cd .. && nodemon index.js",
+    "dev": "cd ./scripts && node ddbTable create && node ddbTable load && cd .. && nodemon index.js",
     "test": "cd ./scripts && node createDDBTable.js && node loadDDBTable.js && cd .. && jest --watchAll --verbose --coverage",
-    "debug": "DEBUG=* nodemon index.js"
+    "debug": "DEBUG=* nodemon index.js",
+    "lint": "eslint ./"
   },
   "jest": {
     "testEnvironment": "node",
@@ -22,10 +23,14 @@
     "aws-sdk": "^2.673.0",
     "config": "^3.3.1",
     "debug": "^4.1.1",
+    "eslint-plugin-jest": "^23.13.2",
     "express": "^4.17.1",
     "lightship": "^6.1.0"
   },
   "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2",
     "jest": "^26.0.1",
     "nodemon": "^2.0.4",
     "supertest": "^4.0.2"

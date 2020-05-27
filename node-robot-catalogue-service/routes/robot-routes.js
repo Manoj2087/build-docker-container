@@ -8,22 +8,22 @@ const deleteRobot = require('../robots/deleteRobot');
 
 const router = Router();
 
-//GET health
-//healthcheckRobotCatalogueService
-router.get('/healthcheck', function (req, res) {
-    res.status(200).json({status: 'UP'});
+// GET health
+// healthcheckRobotCatalogueService
+router.get('/healthcheck', (req, res) => {
+  res.status(200).json({ status: 'UP' });
 });
-//POST robots
+// POST robots
 router.post('/', createRobot);
-//GET robots
+// GET robots
 router.get('/', listRobots);
-//GET robots/filterbytype?type=<value>
+// GET robots/filterbytype?type=<value>
 router.get('/filterbytype', listRobotByType);
-//GET robots/{name}
+// GET robots/{name}
 router.get('/:name', getRobot);
-//PUT robots/{name}
+// PUT robots/{name}
 router.put('/:name', updateRobot);
-//DELETE robots/{name}
+// DELETE robots/{name}
 router.delete('/:name', deleteRobot);
 
 module.exports = router;

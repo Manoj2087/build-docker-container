@@ -18,8 +18,8 @@ services:
       MYAPP_ROBOT_T_TYPE_INDEX: type-index
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE    
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-      DEBUG: robots
-    ports:
+      DEBUG: ddb,ddb:*,robots,robots:*
+    ports:          
       - "3000:3000"
     volumes:
       - '.:/usr/src/app'
