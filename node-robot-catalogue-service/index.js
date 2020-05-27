@@ -2,8 +2,8 @@ const express = require('express');
 const routes = require('./routes/robot-routes');
 const robotDebug = require('debug')('robot')
 
-const server = express();
-server.use(express.json());
+const app = express();
+app.use(express.json());
 
 robotDebug('DEBUG robot...');
 
@@ -15,10 +15,10 @@ robotDebug('env MYAPP_ROBOT_T_TYPE_INDEX:' +  process.env.MYAPP_ROBOT_T_TYPE_IND
 robotDebug('env DEBUG:' +  process.env.DEBUG);  
 robotDebug('env PORT:' +  process.env.PORT);  
 
-server.use('/v1/robots', routes);
+app.use('/v1/robots', routes);
 
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => console.log(`Server is live at localhost:${PORT}`));
+var server = app.listen(PORT, () => console.log(`app is live at localhost:${PORT}`));
 
 module.exports = server
