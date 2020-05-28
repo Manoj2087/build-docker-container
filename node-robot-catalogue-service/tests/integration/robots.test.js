@@ -6,12 +6,15 @@ const deleteDDBTable = require('../../scripts/deleteDDBTable');
 let server;
 
 describe('/v1/robots', () => {
-  beforeEach(async () => { 
+  // eslint-disable-next-line jest/no-hooks
+  beforeEach(async () => {
     await createDDBTable();
     await loadDDBTable();
+    // eslint-disable-next-line global-require
     server = require('../../index');
   });
-  afterEach(async () => { 
+  // eslint-disable-next-line jest/no-hooks
+  afterEach(async () => {
     server.close();
     await deleteDDBTable();
   });
@@ -83,8 +86,11 @@ describe('/v1/robots', () => {
         .get('/v1/robots');
       expect(res.status).toBe(200);
       expect(res.body).toHaveLength(3);
+      // eslint-disable-next-line jest/no-truthy-falsy
       expect(res.body.some((g) => g.name === 'wall-e')).toBeTruthy();
+      // eslint-disable-next-line jest/no-truthy-falsy
       expect(res.body.some((g) => g.name === 't1000')).toBeTruthy();
+      // eslint-disable-next-line jest/no-truthy-falsy
       expect(res.body.some((g) => g.name === 't800')).toBeTruthy();
     });
   });
