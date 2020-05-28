@@ -6,9 +6,13 @@
   "scripts": {
     "prod": "node index.js",
     "dev": "cd ./scripts && node ddbTable create && node ddbTable load && cd .. && nodemon index.js",
-    "test": "cd ./scripts && node createDDBTable.js && node loadDDBTable.js && cd .. && jest --watchAll --verbose --coverage",
+    "test": "jest --watchAll --verbose --coverage",
     "debug": "DEBUG=* nodemon index.js",
-    "lint": "eslint ./"
+    "lint": "eslint ./",
+    "docker-dev-up": "ENV=dev DEBUG='ddb*,robots*' docker-compose up --build",
+    "docker-test-up": "ENV=test docker-compose up --build",
+    "docker-dev-down": "docker-compose down && docker image prune -f",
+    "docker-test-down": "docker-compose down && docker image prune -f"
   },
   "jest": {
     "testEnvironment": "node",

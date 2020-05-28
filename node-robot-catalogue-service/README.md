@@ -2,7 +2,8 @@
 
 ## Run Dev locally
 ```
-ENV=dev docker-compose up --build
+ENV=dev DEBUG="ddb*,robots*" \
+docker-compose up --build
 ```
 ## Run Test locally
 ```

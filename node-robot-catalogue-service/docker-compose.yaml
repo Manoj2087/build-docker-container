@@ -18,10 +18,12 @@ services:
       MYAPP_ROBOT_T_TYPE_INDEX: type-index
       AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE    
       AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-      DEBUG: ddb,ddb:*,robots,robots:*
+      # Pass enivironment Variable DEBUG  ddb*,robots*
+      DEBUG: $DEBUG
     ports:          
       - "3000:3000"
     volumes:
       - '.:/usr/src/app'
       - /usr/src/app/node_modules/
+    # Pass enivironment Variable ENV 'test' or 'dev' 
     command: ["run",$ENV]
