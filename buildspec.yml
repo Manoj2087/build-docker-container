@@ -1,0 +1,75 @@
+version: 0.2
+
+env:
+  variables:
+    TEST_BUILD_SPEC_ENV_VAR: 'test'
+    NODE_VER: '12.17'
+    PYTHON_VER: '3.7'
+  exported-variables:
+    - CODEBUILD_START_TIME
+  secrets-manager:
+    TEST_BUILD_SPEC_SECRETS_MGR_VAR: my-app-secrets:git-personal-access-token
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: '$NODE_VER'
+      python: '$PYTHON_VER'
+    commands:
+      - echo 'install phase command1'
+      - exit 1
+      - echo 'install phase command2'
+    finally:
+      - echo 'install phase Finally'
+  pre_build:
+    commands:
+      - echo 'pre_build phase command1'
+      - echo 'pre_build phase command2'
+      - printenv
+    finally:
+      - echo 'pre_build phase Finally'
+  build:
+    commands:
+      - echo 'build phase command1'
+      - echo 'build phase command2'
+    finally:
+      - echo 'build phase Finally'
+  post_build:
+    commands:
+      - echo 'post_build phase command1'
+      - echo 'post_build phase command2'
+    finally:
+      - echo 'post_build phase Finally'
+# reports:
+#   report-name-or-arn:
+#     files:
+#       - location
+#       - location
+#     base-directory: location
+#     discard-paths: yes
+#     file-format: JunitXml | CucumberJson | VisualStudioTrx | TestNGXml
+# artifacts:
+#   files:
+#     - location
+#     - location
+#   name: artifact-name
+#   discard-paths: yes
+#   base-directory: location
+#   secondary-artifacts:
+#     artifactIdentifier:
+#       files:
+#         - location
+#         - location
+#       name: secondary-artifact-name
+#       discard-paths: yes
+#       base-directory: location
+#     artifactIdentifier:
+#       files:
+#         - location
+#         - location
+#       discard-paths: yes
+#       base-directory: location
+# cache:
+#   paths:
+#     - path
+#     - path
