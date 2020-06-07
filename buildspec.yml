@@ -23,7 +23,6 @@ phases:
   pre_build:
     commands:
       - echo 'pre_build phase command1'
-      - exit 1
       - echo 'pre_build phase command2'
       - printenv
     finally:
@@ -31,6 +30,7 @@ phases:
   build:
     commands:
       - echo 'build phase command1'
+      - exit 1
       - echo 'build phase command2'
     finally:
       - echo 'build phase Finally'
