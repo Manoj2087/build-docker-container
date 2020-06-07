@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     TEST_BUILD_SPEC_ENV_VAR: 'test'
-    NODE_VER: '12.17'
+    NODE_VER: '12'
     PYTHON_VER: '3.7'
   exported-variables:
     - CODEBUILD_START_TIME
