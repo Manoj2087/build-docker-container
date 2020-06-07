@@ -17,13 +17,13 @@ phases:
       python: '$PYTHON_VER'
     commands:
       - echo 'install phase command1'
-      - exit 1
       - echo 'install phase command2'
     finally:
       - echo 'install phase Finally'
   pre_build:
     commands:
       - echo 'pre_build phase command1'
+      - exit 1
       - echo 'pre_build phase command2'
       - printenv
     finally:
